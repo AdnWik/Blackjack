@@ -1,2 +1,4 @@
 /Blackjack.code-workspace
 /blackjack_venv
+/.pytest_cache
+/blackjack/__pycache__

@@ -3,15 +3,16 @@
 
 
 class Card:
-    """_summary_
+    """
+    _summary_
     """
 
-    pack = []
+    packOfCards = []
 
     def __init__(self, value, color) -> None:
         self.value = value
         self.color = color
-        Card.pack.append(self)
+        Card.packOfCards.append(self)
 
     def __repr__(self) -> str:
         return f'Card|{self.value}:{self.color}'
@@ -21,6 +22,9 @@ class Card:
 
     @staticmethod
     def create_pack():
+        """
+        Generate pack of cards
+        """
         pack_value = [2, 3, 4, 5, 6, 7, 8, 9, 10, 'J', 'Q', 'K', 'A']
         pack_color = ['Karo', 'Pik', 'Trefl', 'Kier']
 
@@ -29,7 +33,8 @@ class Card:
                 Card(value, color)
 
 
-Card.create_pack()
+if __name__ == '__main__':
+    Card.create_pack()
 
-for card in Card.pack:
-    print(card)
+    for card in Card.packOfCards:
+        print(card)
