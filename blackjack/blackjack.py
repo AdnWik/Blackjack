@@ -3,6 +3,22 @@ from random import shuffle
 """
 
 
+class Defeat(Exception):
+    """_summary_
+
+    Args:
+        Exception (_type_): _description_
+    """
+
+
+class Win(Exception):
+    """_summary_
+
+    Args:
+        Exception (_type_): _description_
+    """
+
+
 class Card:
     """
     _summary_
@@ -68,7 +84,23 @@ class Player:
         self.hand = []
 
     def calculate_hand_power(self) -> None:
-        self.hand_power = sum([card.score for card in self.hand])
+        if len(self.hand) > 2:  # Jeśli więcej niż 2 karty na ręce to AS = 1
+            self.hand_power = sum([card.score for card in self.hand])
+
+        else:   # Jeśli 2 karty na ręce to AS = 11
+            for card in self.hand:
+                if card.value == 'A':
+                    card.score = 11
+            self.hand_power = sum([card.score for card in self.hand])
+
+        if self.hand_power == 21:
+            raise Win('WIN!')
+        elif self.hand_power > 21:
+            set_hand = {card.value for card in self.hand}
+            if 'A' == set_hand and len(set_hand) == 1:
+                raise Win('WIN!')
+            else:
+                raise Defeat('Too much power')
 
     def take_cards(self, number_of_cards=1) -> None:
         took_cards = 0
@@ -112,6 +144,9 @@ class Game:
     pass
 
 
+
+
+
 if __name__ == '__main__':
     Deck.create_pack()
     Deck.shuffle_cards()
@@ -119,12 +154,40 @@ if __name__ == '__main__':
     croupier = Croupier()
     human1 = Human('Adrian', 'W-ik')
 
-    human1.take_cards(2)
-    croupier.take_cards(2)
-    
-    print(croupier)
-    print(human1)
+    try:
+        human1.take_cards(2)
+    except Defeat as error:
+        print(error)
+    except Win as error:
+        print(error)
 
+    try:
+        croupier.take_cards(2)
+    except Defeat as error:
+        print(error)
+    except Win as error:
+        print(error)
+
+    player_choice = 0
+    while player_choice != 1:
+        print(croupier)
+        print(human1)
+        player_choice = int(input('0 - Dobierasz czy 1 - pasujesz?'))
+        if player_choice != 1:
+            try:
+                human1.take_cards()
+            except Defeat as error:
+                print(error)
+                player_choice = 1
+            except Win as error:
+                print(error)
+                player_choice = 1
+                
+
+    if croupier.hand_power > human1.hand_power:
+        print(f'Croupier win! C:{croupier.hand_power} -> P:{human1.hand_power}')
+    else:
+        print(f'Player win! P:{human1.hand_power} -> C:{croupier.hand_power}')
     # Dobierasz czy pasujesz?
     # Koniec gdy gracz pasuje lub suma jego kart > 21
     # Krupier wygrywa gdy gracz spasuje a gracz ma mniej punktów niż 21 a on ma więcej od gracza
