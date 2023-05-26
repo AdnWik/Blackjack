@@ -1,3 +1,4 @@
+from random import shuffle
 """_summary_
 """
 
@@ -51,6 +52,12 @@ class Deck:
                     Deck.packOfCards.append(Card(value, color))
             packs += 1
 
+    @staticmethod
+    def shuffle_cards() -> None:
+        """_summary_
+        """
+        shuffle(Deck.packOfCards)
+
 
 class Player:
     """_summary_
@@ -84,7 +91,8 @@ class Human(Player):
         self.last_name = last_name
 
     def __str__(self) -> str:
-        return f'{self.first_name} {self.last_name} | Hand power: {self.hand_power} | Hand: {self.hand}'
+        return (f'{self.first_name} {self.last_name} '
+                f'| Hand power: {self.hand_power} | Hand: {self.hand}')
 
 
 class Croupier(Player):
@@ -97,7 +105,6 @@ class Croupier(Player):
     def __str__(self) -> str:
         return f'Croupier | Hand power: {self.hand_power} | Hand: {self.hand}'
 
- 
 
 class Game:
     """_summary_
@@ -107,14 +114,21 @@ class Game:
 
 if __name__ == '__main__':
     Deck.create_pack()
+    Deck.shuffle_cards()
 
     croupier = Croupier()
     human1 = Human('Adrian', 'W-ik')
 
+    human1.take_cards(2)
     croupier.take_cards(2)
-    human1.take_cards(4)
-
-
+    
     print(croupier)
     print(human1)
 
+    # Dobierasz czy pasujesz?
+    # Koniec gdy gracz pasuje lub suma jego kart > 21
+    # Krupier wygrywa gdy gracz spasuje a gracz ma mniej punktów niż 21 a on ma więcej od gracza
+    # jeśli masz tylko 2 asy twoje punkty to 21
+    # Jeśli as i figura twoje punkty to 21
+    # jesli masz 3 karty i jedna z nich to as to as ma wartośc 1
+    # jeden as to 11

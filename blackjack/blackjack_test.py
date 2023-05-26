@@ -1,7 +1,7 @@
-from blackjack import Card
+from blackjack import Deck
 
 
 def test_card_amounth():
-    Card.create_pack()
-    score = len(Card.packOfCards)
+    Deck.create_pack()
+    score = len(Deck.packOfCards)
     assert score == 52
