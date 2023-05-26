@@ -82,6 +82,7 @@ class Player:
         self.score = 0
         self.hand_power = 0
         self.hand = []
+        self.stand = False
 
     def calculate_hand_power(self) -> None:
         if len(self.hand) > 2:  # Jeśli więcej niż 2 karty na ręce to AS = 1
@@ -93,14 +94,15 @@ class Player:
                     card.score = 11
             self.hand_power = sum([card.score for card in self.hand])
 
+    def check_hand(self):
         if self.hand_power == 21:
-            raise Win('WIN!')
+            raise Win('BLACKJACK!')
         elif self.hand_power > 21:
             set_hand = {card.value for card in self.hand}
-            if 'A' == set_hand and len(set_hand) == 1:
-                raise Win('WIN!')
+            if 'A' in set_hand and len(set_hand) == 1:
+                raise Win('BLACKJACK!')
             else:
-                raise Defeat('Too much power')
+                raise Defeat('GAME OVER')
 
     def take_cards(self, number_of_cards=1) -> None:
         took_cards = 0
@@ -117,7 +119,7 @@ class Human(Player):
     Args:
         Player (_type_): _description_
     """
-    def __init__(self, first_name, last_name, score=0) -> None:
+    def __init__(self, first_name, last_name) -> None:
         super().__init__()
         self.first_name = first_name
         self.last_name = last_name
@@ -125,6 +127,9 @@ class Human(Player):
     def __str__(self) -> str:
         return (f'{self.first_name} {self.last_name} '
                 f'| Hand power: {self.hand_power} | Hand: {self.hand}')
+    
+    def __repr__(self) -> str:
+        return f'{self.first_name} {self.last_name}'
 
 
 class Croupier(Player):
@@ -133,21 +138,104 @@ class Croupier(Player):
     Args:
         Player (_type_): _description_
     """
+    def __init__(self) -> None:
+        super().__init__()
+        self.name = 'Croupier'
 
     def __str__(self) -> str:
-        return f'Croupier | Hand power: {self.hand_power} | Hand: {self.hand}'
+        return f'{self.name} | Hand power: {self.hand_power} | Hand: {self.hand}'
 
 
 class Game:
     """_summary_
     """
-    pass
+    def __init__(self) -> None:
+        self.croupier = Croupier()
+        self.players = []
+
+    def add_players(self) -> None:
+        while True:
+            print('Enter your first name')
+            first_name = input('>>> ')
+
+            print('Enter your last name')
+            last_name = input('>>> ')
+            self.players.append(Human(first_name, last_name))
+            print(f'Player {self.players[-1].first_name} added')
+            print('Add next one? (Y/n)')
+            next_one = input('>>> ')
+            if next_one != 'Y':
+                break
+
+    @staticmethod
+    def prepare_cards() -> None:
+        Deck.create_pack()
+        Deck.shuffle_cards()
 
 
+    def give_cards(self) -> None:
+        for player in self.players:
+            player.take_cards(2)
+        self.croupier.take_cards(2)
 
+    def playing(self) -> str:
+        result = None
+        game = True
+        while game:
+            for player in self.players:
+                try:
+                    player.check_hand()
+                except Win as win:
+                    result = f'{player.first_name} {win}'
+                    game = False
+                    break
+                except Defeat as lose:
+                    result = f'{player.first_name} {lose}'
+                    game = False
+                    break
+            
+            try:
+                self.croupier.check_hand()
+            except Win as win:
+                result = f'{self.croupier.name} {win}'
+                game = False
+            except Defeat as lose:
+                result = f'{self.croupier.name} {lose}'
+                game = False
+
+            if game != False:
+                for player in self.players:
+                    if player.stand == False:
+                        print('\n')
+                        print(player)
+                        print(f'{player.first_name} Hit or Stand?')
+                        print('1 - hit\n2 - Stand')
+                        player_choice = int(input('>>> '))
+                        if player_choice != 1:
+                            player.stand = True
+                        else:
+                            player.take_cards()
+
+                if self.croupier.hand_power < 19:
+                    self.croupier.take_cards()
+                else:
+                    self.croupier.stand = True
+
+                x = {player.stand for player in self.players}
+                if True in x and len(x) == 1 and self.croupier.stand == True:
+                    game = False
+        #TODO: Implement result when all players and Croupier stand
+        return '\n' + result
 
 
 if __name__ == '__main__':
+    game = Game()
+    game.add_players()
+    game.prepare_cards()
+    game.give_cards()
+    print(game.playing())
+
+    """
     Deck.create_pack()
     Deck.shuffle_cards()
 
@@ -172,7 +260,7 @@ if __name__ == '__main__':
     while player_choice != 1:
         print(croupier)
         print(human1)
-        player_choice = int(input('0 - Dobierasz czy 1 - pasujesz?'))
+        player_choice = int(input('0 - Hit or 1 - Stand?'))
         if player_choice != 1:
             try:
                 human1.take_cards()
@@ -188,6 +276,7 @@ if __name__ == '__main__':
         print(f'Croupier win! C:{croupier.hand_power} -> P:{human1.hand_power}')
     else:
         print(f'Player win! P:{human1.hand_power} -> C:{croupier.hand_power}')
+    """
     # Dobierasz czy pasujesz?
     # Koniec gdy gracz pasuje lub suma jego kart > 21
     # Krupier wygrywa gdy gracz spasuje a gracz ma mniej punktów niż 21 a on ma więcej od gracza
