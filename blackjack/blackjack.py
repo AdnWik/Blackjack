@@ -52,6 +52,7 @@ class Deck:
     """_summary_
     """
     packOfCards = []
+    rejectCards = []
 
     @staticmethod
     def create_pack(number_of_packs=1):
@@ -112,6 +113,10 @@ class Player:
             Player.calculate_hand_power(self)
             took_cards += 1
 
+    def return_cards(self) -> None:
+        Deck.rejectCards.extend(self.hand)
+        self.hand.clear()
+
 
 class Human(Player):
     """_summary_
@@ -155,21 +160,21 @@ class Game:
 
     def add_players(self) -> None:
         while True:
-            print('Enter your first name')
+            print('\nEnter your first name')
             first_name = input('>>> ')
 
             print('Enter your last name')
             last_name = input('>>> ')
             self.players.append(Human(first_name, last_name))
-            print(f'Player {self.players[-1].first_name} added')
-            print('Add next one? (Y/n)')
+            print(f'Player {self.players[-1].first_name} {self.players[-1].last_name} added')
+            print('\nAdd next one? (Y/n)')
             next_one = input('>>> ')
             if next_one != 'Y':
                 break
 
     @staticmethod
     def prepare_cards() -> None:
-        Deck.create_pack()
+        Deck.create_pack(3)
         Deck.shuffle_cards()
 
 
@@ -177,6 +182,13 @@ class Game:
         for player in self.players:
             player.take_cards(2)
         self.croupier.take_cards(2)
+
+    def clear_hands(self) -> None:
+        for player in self.players:
+            player.stand = False
+            player.return_cards()
+        self.croupier.stand = False
+        self.croupier.return_cards()
 
     def playing(self) -> str:
         result = None
@@ -216,24 +228,34 @@ class Game:
                         else:
                             player.take_cards()
 
-                if self.croupier.hand_power < 19:
+                print(self.croupier)
+                if self.croupier.hand_power < 17:
                     self.croupier.take_cards()
                 else:
                     self.croupier.stand = True
 
-                x = {player.stand for player in self.players}
-                if True in x and len(x) == 1 and self.croupier.stand == True:
+                players_stand = {player.stand for player in self.players}
+                if True in players_stand and len(players_stand) == 1 and self.croupier.stand == True: # jezeli gracze i krupier spasowali
                     game = False
+                    high_score_player = max(self.players, key=lambda player: player.hand_power)
+                    if high_score_player.hand_power > self.croupier.hand_power:
+                        result = f'{high_score_player.first_name}'
+                    else:
+                        result = f'{self.croupier.name}'
         #TODO: Implement result when all players and Croupier stand
         return '\n' + result
-
 
 if __name__ == '__main__':
     game = Game()
     game.add_players()
     game.prepare_cards()
-    game.give_cards()
-    print(game.playing())
+    
+    n = 0
+    while n < 10:
+        game.give_cards()
+        print(game.playing())
+        game.clear_hands()
+        n += 1
 
 
     # DONE: Dobierasz czy pasujesz?
