@@ -235,52 +235,11 @@ if __name__ == '__main__':
     game.give_cards()
     print(game.playing())
 
-    """
-    Deck.create_pack()
-    Deck.shuffle_cards()
 
-    croupier = Croupier()
-    human1 = Human('Adrian', 'W-ik')
-
-    try:
-        human1.take_cards(2)
-    except Defeat as error:
-        print(error)
-    except Win as error:
-        print(error)
-
-    try:
-        croupier.take_cards(2)
-    except Defeat as error:
-        print(error)
-    except Win as error:
-        print(error)
-
-    player_choice = 0
-    while player_choice != 1:
-        print(croupier)
-        print(human1)
-        player_choice = int(input('0 - Hit or 1 - Stand?'))
-        if player_choice != 1:
-            try:
-                human1.take_cards()
-            except Defeat as error:
-                print(error)
-                player_choice = 1
-            except Win as error:
-                print(error)
-                player_choice = 1
-                
-
-    if croupier.hand_power > human1.hand_power:
-        print(f'Croupier win! C:{croupier.hand_power} -> P:{human1.hand_power}')
-    else:
-        print(f'Player win! P:{human1.hand_power} -> C:{croupier.hand_power}')
-    """
-    # Dobierasz czy pasujesz?
-    # Koniec gdy gracz pasuje lub suma jego kart > 21
-    # Krupier wygrywa gdy gracz spasuje a gracz ma mniej punktów niż 21 a on ma więcej od gracza
-    # jeśli masz tylko 2 asy twoje punkty to 21
-    # Jeśli as i figura twoje punkty to 21
-    # jesli masz 3 karty i jedna z nich to as to as ma wartośc 1
-    # jeden as to 11
+    # DONE: Dobierasz czy pasujesz?
+    # TODO: Koniec gdy gracz pasuje lub suma jego kart > 21
+    # TODO: Krupier wygrywa gdy gracz spasuje a gracz ma mniej punktów niż 21 a on ma więcej od gracza
+    # DONE: jeśli masz tylko 2 asy twoje punkty to 21
+    # DONE: Jeśli as i figura twoje punkty to 21
+    # DONE: jesli masz 3 karty i jedna z nich to as to as ma wartośc 1
+    # DONE: jeden as to 11
