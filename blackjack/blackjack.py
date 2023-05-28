@@ -1,6 +1,4 @@
 from random import shuffle
-"""_summary_
-"""
 
 
 class Defeat(Exception):
@@ -264,16 +262,13 @@ class Game:
                                          participant.hand_power)
                     max_hand_power_participant.score += 1
                     result = f'{max_hand_power_participant.show_name()} WIN!'
-                    
+
         return f'\n>>>>> {result} <<<<<\n'
 
     def show_results(self) -> str:
-        participants = []
-        participants.append(self.croupier)
-        for player in self.players:
-            participants.append(player)
-
-        participants_sorted = sorted(participants, key= lambda participant: participant.score, reverse=True)
+        participants_sorted = sorted(self.participants,
+                                     key=lambda participant:
+                                     participant.score, reverse=True)
         for participant in participants_sorted:
             print(f'{participant.show_name()} SCORE:{participant.score}')
 
@@ -284,7 +279,7 @@ if __name__ == '__main__':
     print('='*100)
     game.add_players()
     game.prepare_cards()
-    
+
     n = 1
     while n <= 10:
         print('='*100)
@@ -294,4 +289,3 @@ if __name__ == '__main__':
         game.clear_hands()
         n += 1
     game.show_results()
-
