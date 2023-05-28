@@ -99,8 +99,8 @@ class Player:
         if self.hand_power == 21:
             raise Win('BLACKJACK!')
         elif self.hand_power > 21:
-            set_hand = {card.value for card in self.hand}
-            if 'A' in set_hand and len(set_hand) == 1:
+            _hand = {card.value for card in self.hand}
+            if 'A' in _hand and len(_hand) == 1:
                 raise Win('BLACKJACK!')
             else:
                 raise Defeat('GAME OVER')
@@ -132,8 +132,11 @@ class Human(Player):
     def __str__(self) -> str:
         return (f'{self.first_name} {self.last_name} '
                 f'| Hand power: {self.hand_power} | Hand: {self.hand}')
-    
+
     def __repr__(self) -> str:
+        return f'{self.first_name} {self.last_name}'
+
+    def show_name(self) -> str:
         return f'{self.first_name} {self.last_name}'
 
 
@@ -149,6 +152,9 @@ class Croupier(Player):
 
     def __str__(self) -> str:
         return f'{self.name} | Hand power: {self.hand_power} | Hand: {self.hand}'
+    
+    def show_name(self) -> str:
+        return f'{self.name}'
 
 
 class Game:
@@ -157,19 +163,32 @@ class Game:
     def __init__(self) -> None:
         self.croupier = Croupier()
         self.players = []
+        self.participants = []
 
     def add_players(self) -> None:
+        """
+        Create n-players and Croupier,
+        next add all of them to participants list
+        """
+        _player_no = 1
         while True:
-            print('\nEnter your first name')
+            print(f'\nPlayer {_player_no}')
+            print('\nEnter first name')
             first_name = input('>>> ')
 
-            print('Enter your last name')
+            print('Enter last name')
             last_name = input('>>> ')
+
             self.players.append(Human(first_name, last_name))
-            print(f'Player {self.players[-1].first_name} {self.players[-1].last_name} added')
-            print('\nAdd next one? (Y/n)')
-            next_one = input('>>> ')
-            if next_one != 'Y':
+            _player_no += 1
+            print(f'Player {self.players[-1].first_name} '
+                  f'{self.players[-1].last_name} added'
+                  f'\n\nAdd Player {_player_no}? (Y/n)')
+            
+            next_player = input('>>> ')
+            if next_player != 'Y':
+                self.participants.extend(self.players)
+                self.participants.append(self.croupier)
                 break
 
     @staticmethod
@@ -177,91 +196,102 @@ class Game:
         Deck.create_pack(3)
         Deck.shuffle_cards()
 
-
     def give_cards(self) -> None:
-        for player in self.players:
-            player.take_cards(2)
-        self.croupier.take_cards(2)
+        """
+        Give first two cards to all of participants
+        """
+        for participant in self.participants:
+            participant.take_cards(2)
 
     def clear_hands(self) -> None:
-        for player in self.players:
-            player.stand = False
-            player.return_cards()
-        self.croupier.stand = False
-        self.croupier.return_cards()
+        """
+        Set stand status to False and return cards
+        from hand to reject_cards list for all of participants
+        """
+        for participant in self.participants:
+            participant.stand = False
+            participant.return_cards()
 
     def playing(self) -> str:
         result = None
         game = True
         while game:
-            for player in self.players:
-                try:
-                    player.check_hand()
-                except Win as win:
-                    result = f'{player.first_name} {win}'
-                    game = False
-                    break
-                except Defeat as lose:
-                    result = f'{player.first_name} {lose}'
-                    game = False
-                    break
-            
-            try:
-                self.croupier.check_hand()
-            except Win as win:
-                result = f'{self.croupier.name} {win}'
-                game = False
-            except Defeat as lose:
-                result = f'{self.croupier.name} {lose}'
-                game = False
+            for participant in self.participants:
+                if game is not False:
+                    try:
+                        participant.check_hand()
+                    except Win as win:
+                        participant.score += 1
+                        result = f'{participant.show_name()} {win}'
+                        game = False
+                        break
+                    except Defeat as lose:
+                        #participant.score -= 1
+                        result = f'{participant.show_name()} {lose}'
+                        game = False
+                        break
 
-            if game != False:
-                for player in self.players:
-                    if player.stand == False:
+            if game is not False:
+                for participant in self.participants:
+                    if participant.stand is False:
                         print('\n')
-                        print(player)
-                        print(f'{player.first_name} Hit or Stand?')
-                        print('1 - hit\n2 - Stand')
-                        player_choice = int(input('>>> '))
-                        if player_choice != 1:
-                            player.stand = True
+                        print(participant)
+                        if participant.__class__.__name__ != 'Croupier':
+                            # If not Croupier
+                            print(f'{participant.first_name} Hit or Stand?')
+                            print('1 - hit\n2 - Stand')
+                            participant_choice = int(input('>>> '))
+                            if participant_choice == 1:
+                                participant.take_cards()
+                            else:
+                                participant.stand = True
                         else:
-                            player.take_cards()
+                            # If Croupier
+                            if participant.hand_power < 17:
+                                participant.take_cards()
+                                print(f'{participant.show_name()} take a card')
+                            else:
+                                participant.stand = True
+                                print(f'{participant.show_name()} stand')
 
-                print(self.croupier)
-                if self.croupier.hand_power < 17:
-                    self.croupier.take_cards()
-                else:
-                    self.croupier.stand = True
-
-                players_stand = {player.stand for player in self.players}
-                if True in players_stand and len(players_stand) == 1 and self.croupier.stand == True: # jezeli gracze i krupier spasowali
+                participants_stand = {participant.stand
+                                      for participant
+                                      in self.participants}
+                if True in participants_stand and len(participants_stand) == 1:
                     game = False
-                    high_score_player = max(self.players, key=lambda player: player.hand_power)
-                    if high_score_player.hand_power > self.croupier.hand_power:
-                        result = f'{high_score_player.first_name}'
-                    else:
-                        result = f'{self.croupier.name}'
-        #TODO: Implement result when all players and Croupier stand
-        return '\n' + result
+                    max_hand_power_participant = max(self.participants,
+                                         key=lambda participant:
+                                         participant.hand_power)
+                    max_hand_power_participant.score += 1
+                    result = f'{max_hand_power_participant.show_name()} WIN!'
+                    
+        return f'\n>>>>> {result} <<<<<\n'
+
+    def show_results(self) -> str:
+        participants = []
+        participants.append(self.croupier)
+        for player in self.players:
+            participants.append(player)
+
+        participants_sorted = sorted(participants, key= lambda participant: participant.score, reverse=True)
+        for participant in participants_sorted:
+            print(f'{participant.show_name()} SCORE:{participant.score}')
 
 if __name__ == '__main__':
     game = Game()
+    print('='*100)
+    print('Welcome in BLACKJACK game!')
+    print('='*100)
     game.add_players()
     game.prepare_cards()
     
-    n = 0
-    while n < 10:
+    n = 1
+    while n <= 10:
+        print('='*100)
+        print(f'n:{n}')
         game.give_cards()
         print(game.playing())
         game.clear_hands()
         n += 1
+    game.show_results()
 
-
-    # DONE: Dobierasz czy pasujesz?
-    # TODO: Koniec gdy gracz pasuje lub suma jego kart > 21
-    # TODO: Krupier wygrywa gdy gracz spasuje a gracz ma mniej punktów niż 21 a on ma więcej od gracza
-    # DONE: jeśli masz tylko 2 asy twoje punkty to 21
-    # DONE: Jeśli as i figura twoje punkty to 21
-    # DONE: jesli masz 3 karty i jedna z nich to as to as ma wartośc 1
-    # DONE: jeden as to 11
