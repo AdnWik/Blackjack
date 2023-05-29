@@ -33,10 +33,14 @@ class Card:
         return f'|{self.value:^4}:{self.color:^7}|'
 
     def set_score(self) -> int:
-        """_summary_
+        """
+        Set score value for all cards:
+        2-10 = value from card (2-10)
+        Q,J,K = 10
+        A = 1
 
         Returns:
-            _type_: _description_
+            int: score of card
         """
         if isinstance(self.value, int):
             return self.value
@@ -47,7 +51,8 @@ class Card:
 
 
 class Deck:
-    """_summary_
+    """
+    Deck class
     """
     packOfCards = []
     rejectCards = []
@@ -69,7 +74,9 @@ class Deck:
 
     @staticmethod
     def shuffle_cards() -> None:
-        """_summary_
+        """
+        Shuffle cards from list Deck.packOfCards
+        (shuffle method from random)
         """
         shuffle(Deck.packOfCards)
 
@@ -84,6 +91,10 @@ class Player:
         self.stand = False
 
     def calculate_hand_power(self) -> None:
+        """
+        Calculate hand power from self.hand and
+        set calculate value in self.hand_power
+        """
         if len(self.hand) > 2:  # Jeśli więcej niż 2 karty na ręce to AS = 1
             self.hand_power = sum([card.score for card in self.hand])
 
