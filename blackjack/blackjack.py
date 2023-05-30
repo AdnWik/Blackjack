@@ -95,14 +95,12 @@ class Player:
         Calculate hand power from self.hand and
         set calculate value in self.hand_power
         """
-        if len(self.hand) > 2:  # Jeśli więcej niż 2 karty na ręce to AS = 1
-            self.hand_power = sum([card.score for card in self.hand])
-
-        else:   # Jeśli 2 karty na ręce to AS = 11
+        if len(self.hand) <= 2:
             for card in self.hand:
                 if card.value == 'A':
                     card.score = 11
-            self.hand_power = sum([card.score for card in self.hand])
+
+        self.hand_power = sum([card.score for card in self.hand])
 
     def check_hand(self):
         if self.hand_power == 21:
