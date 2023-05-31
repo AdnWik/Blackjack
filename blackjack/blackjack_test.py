@@ -1,4 +1,4 @@
-from blackjack import Deck, Card, Player
+from blackjack import Deck, Card, Player, Win
 
 
 # def test_test():
@@ -94,3 +94,15 @@ def test_change_score_for_a_three_cards():
     player1.calculate_hand_power()
     score = player1.hand_power
     assert score == 3
+
+
+def test_take_cards():
+    """
+    Check first took card
+    """
+    Deck.create_pack()
+    player1 = Player()
+    player1.take_cards()
+
+    score = (player1.hand[0].value, player1.hand[0].color)
+    assert score == (2, 'Karo')
