@@ -100,9 +100,28 @@ def test_take_cards():
     """
     Check first took card
     """
+    Deck.packOfCards = []
+    Deck.rejectCards = []
     Deck.create_pack()
+
     player1 = Player()
     player1.take_cards()
 
     score = (player1.hand[0].value, player1.hand[0].color)
+    assert score == (2, 'Karo')
+
+
+def test_return_cards():
+    """
+    Check first rejected card
+    """
+    Deck.packOfCards = []
+    Deck.rejectCards = []
+    Deck.create_pack()
+
+    player1 = Player()
+    player1.take_cards()
+    player1.return_cards()
+
+    score = (Deck.rejectCards[0].value, Deck.rejectCards[0].color)
     assert score == (2, 'Karo')
