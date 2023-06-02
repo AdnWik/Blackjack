@@ -1,4 +1,5 @@
 from random import shuffle
+from card import Card
 
 
 class Defeat(Exception):
@@ -17,42 +18,9 @@ class Win(Exception):
     """
 
 
-class Card:
-    """
-    _summary_
-    """
-    def __init__(self, value, color) -> None:
-        self.value = value
-        self.color = color
-        self.score = Card.set_score(self)
-
-    def __repr__(self) -> str:
-        return f'|{self.value}:{self.color}|'
-
-    def __str__(self) -> str:
-        return f'|{self.value:^4}:{self.color:^7}|'
-
-    def set_score(self) -> int:
-        """
-        Set score value for all cards:
-        2-10 = value from card (2-10)
-        Q,J,K = 10
-        A = 1
-
-        Returns:
-            int: score of card
-        """
-        if isinstance(self.value, int):
-            return self.value
-        elif self.value != 'A':
-            return 10
-        else:
-            return 1
-
-
 class Deck:
     """
-    Deck class
+    Deck abstract
     """
     packOfCards = []
     rejectCards = []
@@ -63,8 +31,8 @@ class Deck:
         Generate pack of cards
         """
         packs = 0
-        pack_value = [2, 3, 4, 5, 6, 7, 8, 9, 10, 'J', 'Q', 'K', 'A']
-        pack_color = ['Karo', 'Pik', 'Trefl', 'Kier']
+        pack_value = list(range(2, 11)) + ['Jack', 'Queen', 'King', 'Ace']
+        pack_color = ['spades', 'diamonds', 'hearts', 'clubs']
 
         while packs != number_of_packs:
             for color in pack_color:
@@ -97,7 +65,7 @@ class Player:
         """
         if len(self.hand) <= 2:
             for card in self.hand:
-                if card.value == 'A':
+                if card.value == 'Ace':
                     card.score = 11
 
         self.hand_power = sum([card.score for card in self.hand])
@@ -107,7 +75,7 @@ class Player:
             raise Win('BLACKJACK!')
         elif self.hand_power > 21:
             _hand = {card.value for card in self.hand}
-            if 'A' in _hand and len(_hand) == 1:
+            if 'Ace' in _hand and len(_hand) == 1:
                 raise Win('BLACKJACK!')
             else:
                 raise Defeat('GAME OVER')
