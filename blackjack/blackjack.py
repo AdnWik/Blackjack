@@ -1,50 +1,11 @@
 from exceptions import Win, Defeat
 from deck import Deck
-from player import Player
-
-
-class Human(Player):
-    """_summary_
-
-    Args:
-        Player (_type_): _description_
-    """
-    def __init__(self, first_name, last_name) -> None:
-        super().__init__()
-        self.first_name = first_name
-        self.last_name = last_name
-
-    def __str__(self) -> str:
-        return (f'{self.first_name} {self.last_name} '
-                f'| Hand power: {self.hand_power} | Hand: {self.hand}')
-
-    def __repr__(self) -> str:
-        return f'{self.first_name} {self.last_name}'
-
-    def show_name(self) -> str:
-        return f'{self.first_name} {self.last_name}'
-
-
-class Croupier(Player):
-    """_summary_
-
-    Args:
-        Player (_type_): _description_
-    """
-    def __init__(self) -> None:
-        super().__init__()
-        self.name = 'Croupier'
-
-    def __str__(self) -> str:
-        return f'{self.name} | Hand power: {self.hand_power} | Hand: {self.hand}'
-    
-    def show_name(self) -> str:
-        return f'{self.name}'
+from human import Human
+from croupier import Croupier
 
 
 class Game:
-    """_summary_
-    """
+    """Game abstract"""
     def __init__(self) -> None:
         self.croupier = Croupier()
         self.players = []
