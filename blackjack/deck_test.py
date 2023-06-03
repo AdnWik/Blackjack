@@ -1,6 +1,14 @@
 from deck import Deck
 
 
+#def test_test():
+#    given
+
+#    when
+
+#    then
+
+
 def test_card_amount():
     """
     Check generated 52 unique cards in 3 packs
